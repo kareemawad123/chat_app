@@ -1,0 +1,64 @@
+name: porject_n_01
+description: A new Flutter project.
+
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.16.1 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  image_picker: ^0.8.5
+  provider: ^6.0.2
+  firebase_auth: ^3.3.17
+  fluttertoast: ^8.0.9
+  animated_splash_screen: ^1.2.0
+  curved_navigation_bar: ^1.0.3
+  font_awesome_flutter: ^10.1.0
+  animations: ^2.0.2
+  firebase_storage: ^10.2.17
+
+
+
+
+  cupertino_icons: ^1.0.2
+  cloud_firestore: ^3.1.13
+  firebase_core: ^1.15.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+  flutter_lints: ^1.0.0
+
+
+
+flutter:
+  assets:
+    - assets/
+  fonts:
+      - family: MyFlutterApp
+        fonts:
+          - asset: fonts/MyFlutterApp.ttf
+      - family: AquinoDemo
+        fonts:
+          - asset: fonts/AquinoDemo.ttf
+
+      - family: Nisebuschgardens
+        fonts:
+          - asset: fonts/Nisebuschgardens.ttf
+
+      - family: Nunito
+        fonts:
+          - asset: fonts/NunitoBold.ttf
+
+
+  uses-material-design: true
+
+
