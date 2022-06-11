@@ -83,9 +83,22 @@ class FirebaseManager{
       'name': name
     });
   }
+  // Future updateAvatar(String url, String uid) async {
+  //   return await profileList.doc(uid).update({
+  //     'avatar': url
+  //   });
+  // }
+  // Future<String?> getAvatar(String? uid) async {
+  //   String? url;
+  //   await profileList.doc(uid).get().then((snapshot) {
+  //     url = snapshot.data()['avatar'].toString();
+  //   });
+  //   return url;
+  // }
   updateData(String name, String userID) async {
     await FirebaseManager().updateUser(name, userID);
   }
+
   Future uploadImageToFire (File? image, String? userId) async{
     const destination = 'images/';
     try {
@@ -103,8 +116,16 @@ class FirebaseManager{
     String? url;
     final storage = FirebaseStorage.instance;
     const destination = 'images/';
-    await storage.ref(destination).child(userId!).getDownloadURL().then((value) => {url = value})
-        .catchError((error) => {});
+      try {
+        await storage
+            .ref(destination)
+            .child(userId!)
+            .getDownloadURL()
+            .then((value) => {url = value});
+        print('Download Done');
+      } catch (e) {
+        print('-----------Error in download image ---------');
+      }
     print('Image URL: $url');
     return url;
   }

@@ -84,7 +84,9 @@ class _ImageFirebaseState extends State<ImageFirebase> {
   picker() {
     if (image?.path != null) {
       return FileImage(image!);
-    } else {
+    } else if(url != null){
+      return Image.network(url!).image;
+    }else {
       return const AssetImage('assets/profile.jpg');
     }
   }

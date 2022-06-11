@@ -156,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           builder: (context, provider, child) {
                             return ElevatedButton(
                               onPressed: () async {
-                                provider.CheckUserConnection();
+                                provider.checkUserConnection();
                                  if (provider.ActiveConnection == true) {
                                   print('DDone');
                                   User? user = await FirebaseManager.signInFunc(

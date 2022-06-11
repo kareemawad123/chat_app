@@ -10,13 +10,12 @@ import 'package:provider/provider.dart';
 import '../Model/Constants.dart';
 import '../Controller/AuthenticationFunc.dart';
 import '../Controller/ProviderController.dart';
-import '../my_flutter_app_icons.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = 'HomeScreen';
 
-  HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -54,25 +53,20 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     getData();
-    FirebaseFirestore.instance
-        .collection('PersonInfo')
-        .doc(user!.uid)
-        .get()
-        .then((value) => {
-              userModelLogged = UserModel.fromJson(value.data()!),
-            });
+
   }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      print('Selected Item: ${_selectedIndex}');
+      print('Selected Item: $_selectedIndex');
     });
   }
 
   @override
   void dispose() {
     nameController.dispose();
+    Provider.of<ProviderController>(context, listen: false).image = null;
     super.dispose();
   }
 
@@ -80,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-
+    //Provider.of<ProviderController>(context, listen: false).downloadFromFireUrl(user!.uid);
     List<Widget> _pages = <Widget>[
       /// Chats Page
       Center(
@@ -90,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  Container(
+                  SizedBox(
                     height: height * 0.14,
                     child: Row(
                       children: <Widget>[
@@ -100,8 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 50,
                           child: CircleAvatar(
                             backgroundImage:
-                                Provider.of<ProviderController>(context)
-                                    .picker(),
+                                Provider.of<ProviderController>(context,listen: false)
+                                    .picker(user!.uid),
                           ),
                         ),
                         Expanded(
@@ -124,7 +118,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             onPressed: () {
                               logOutDialogueBox(context);
                             },
-                            icon: FaIcon(FontAwesomeIcons.rightFromBracket, color: Colors.white,size: 30,),
+                            icon: const FaIcon(
+                              FontAwesomeIcons.rightFromBracket,
+                              color: Colors.white,
+                              size: 30,
+                            ),
                           ),
                         ),
                       ],
@@ -153,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     //getData();
                                     if (snapShot.data?.docs[index].id !=
                                         user!.uid) {
-                                        return GestureDetector(
+                                      return GestureDetector(
                                         onTap: () {
                                           getData();
                                           print('DDDDD');
@@ -295,7 +293,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontFamily: 'Nisebuschgardens',
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Container(
@@ -437,7 +435,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               openDialogueBox(context);
                             },
                             style: ElevatedButton.styleFrom(
-                              primary: Color(0xff113953),
+                              primary: const Color(0xff113953),
                             ),
                             child: const Text('Edit',
                                 style: TextStyle(fontFamily: 'Nunito')),
@@ -454,8 +452,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 130,
                             child: CircleAvatar(
                               backgroundImage:
-                                  Provider.of<ProviderController>(context)
-                                      .picker(),
+                                  Provider.of<ProviderController>(context,listen: false)
+                                      .picker(user!.uid),
                             ),
                           ),
                         ),
@@ -466,7 +464,17 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Consumer<ProviderController>(
                             builder: (context, provider, child) {
                               return RawMaterialButton(
-                                onPressed: provider.uploadImage,
+                                onPressed: () {
+                                  provider.uploadImage().whenComplete(() {
+                                    FirebaseManager().uploadImageToFire(
+                                        provider.image, user!.uid).then((value) => {
+                                    provider.picker(user!.uid)
+                                    });
+                                  });
+                                  // provider.url =
+                                  //     FirebaseManager().downloadFromFireUrl(user!.uid);
+                                  //provider.downloadFromFireUrl(user!.uid);
+                                },
                                 fillColor: const Color(0xff113953),
                                 child: const Icon(
                                   Icons.add_a_photo_outlined,
@@ -485,7 +493,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-
     ];
     return Scaffold(
       body: Center(
@@ -493,7 +500,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: CurvedNavigationBar(
         height: 50,
-        backgroundColor: Color(0xff113953),
+        backgroundColor: const Color(0xff113953),
         items: const <Widget>[
           Icon(Icons.wechat, size: 30),
           Icon(Icons.account_circle_outlined, size: 30),
@@ -554,13 +561,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   submitAction(context);
                   Navigator.pop(context);
                 },
-                child: Text('Submit'),
+                child: const Text('Submit'),
               ),
               ElevatedButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text('Cancel'),
+                child: const Text('Cancel'),
               )
             ],
           );
