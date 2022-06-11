@@ -83,18 +83,11 @@ class FirebaseManager{
       'name': name
     });
   }
-  // Future updateAvatar(String url, String uid) async {
-  //   return await profileList.doc(uid).update({
-  //     'avatar': url
-  //   });
-  // }
-  // Future<String?> getAvatar(String? uid) async {
-  //   String? url;
-  //   await profileList.doc(uid).get().then((snapshot) {
-  //     url = snapshot.data()['avatar'].toString();
-  //   });
-  //   return url;
-  // }
+  Future updateAvatar(String url, String uid) async {
+    return await profileList.doc(uid).update({
+      'avatar': url
+    });
+  }
   updateData(String name, String userID) async {
     await FirebaseManager().updateUser(name, userID);
   }
@@ -112,22 +105,22 @@ class FirebaseManager{
     }
   }
 
-  downloadFromFireUrl(String? userId) async{
-    String? url;
-    final storage = FirebaseStorage.instance;
-    const destination = 'images/';
-      try {
-        await storage
-            .ref(destination)
-            .child(userId!)
-            .getDownloadURL()
-            .then((value) => {url = value});
-        print('Download Done');
-      } catch (e) {
-        print('-----------Error in download image ---------');
-      }
-    print('Image URL: $url');
-    return url;
-  }
+  //  downloadFromFireUrl(String? userId) {
+  //   String? url;
+  //   final storage = FirebaseStorage.instance;
+  //   const destination = 'images/';
+  //     try {
+  //        storage
+  //           .ref(destination)
+  //           .child(userId!)
+  //           .getDownloadURL()
+  //           .then((value) => {url = value});
+  //       print('Download Done 000');
+  //     } catch (e) {
+  //       print('-----------Error in download image ---------');
+  //     }
+  //   print('Image URL: $url');
+  //   return url ?? 'Null Value000';
+  // }
 
 }

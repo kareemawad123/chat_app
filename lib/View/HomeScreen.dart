@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -49,11 +50,21 @@ class _HomeScreenState extends State<HomeScreen> {
     print(allData);
   }
 
+  delayFunc() {
+    Timer(const Duration(milliseconds: 500), () {
+      setState(() {
+        Provider.of<ProviderController>(context, listen: false)
+            .pickerChats(user!.uid);
+        print('Delay Done');
+      });
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    delayFunc();
     getData();
-
   }
 
   void _onItemTapped(int index) {
@@ -67,6 +78,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     nameController.dispose();
     Provider.of<ProviderController>(context, listen: false).image = null;
+    print(
+        'Image---${Provider.of<ProviderController>(context, listen: false).image}');
     super.dispose();
   }
 
@@ -74,7 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    //Provider.of<ProviderController>(context, listen: false).downloadFromFireUrl(user!.uid);
     List<Widget> _pages = <Widget>[
       /// Chats Page
       Center(
@@ -92,11 +104,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           margin: const EdgeInsets.only(left: 30, top: 30),
                           width: 50,
                           height: 50,
-                          child: CircleAvatar(
-                            backgroundImage:
-                                Provider.of<ProviderController>(context,listen: false)
-                                    .picker(user!.uid),
-                          ),
+                          child: StreamBuilder<QuerySnapshot>(
+                              stream: fireStore
+                                  .collection('PersonInfo').where('uid', isEqualTo: user!.uid)
+                                  .snapshots(),
+                              builder: (context, snapshot) {
+
+                                return snapshot.hasData ? CircleAvatar(
+                                  backgroundImage: NetworkImage(snapshot.data!.docs[0]['avatar']),
+                                ) : const CircularProgressIndicator.adaptive();
+                              }),
                         ),
                         Expanded(
                             child: Container(
@@ -201,9 +218,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Expanded(
                                                   child: Row(
                                                 children: <Widget>[
-                                                  const CircleAvatar(
-                                                    backgroundImage: AssetImage(
-                                                        'assets/profile.png'),
+                                                  CircleAvatar(
+                                                    backgroundImage:
+                                                        NetworkImage(snapShot
+                                                                .data
+                                                                ?.docs[index]
+                                                            ['avatar']),
                                                     maxRadius: 30,
                                                   ),
                                                   const SizedBox(
@@ -450,26 +470,45 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: SizedBox(
                             width: 130,
                             height: 130,
-                            child: CircleAvatar(
-                              backgroundImage:
-                                  Provider.of<ProviderController>(context,listen: false)
-                                      .picker(user!.uid),
-                            ),
+                            child: StreamBuilder<QuerySnapshot>(
+                                stream: fireStore
+                                    .collection('PersonInfo').where('uid', isEqualTo: user!.uid)
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+
+                                  return snapshot.hasData ? CircleAvatar(
+                                    backgroundImage: NetworkImage(snapshot.data!.docs[0]['avatar']),
+                                  ) : const CircularProgressIndicator.adaptive();
+                                }),
                           ),
                         ),
                       ),
                       Positioned(
-                          top: 90,
-                          right: 80,
+                          top: 80,
+                          right: 90,
                           child: Consumer<ProviderController>(
                             builder: (context, provider, child) {
                               return RawMaterialButton(
                                 onPressed: () {
                                   provider.uploadImage().whenComplete(() {
-                                    FirebaseManager().uploadImageToFire(
-                                        provider.image, user!.uid).then((value) => {
-                                    provider.picker(user!.uid)
-                                    });
+                                    print('Task 1');
+                                    FirebaseManager()
+                                        .uploadImageToFire(
+                                            provider.image, user!.uid)
+                                        .whenComplete(() => {
+                                              provider
+                                                  .downloadFromFireUrl(
+                                                      user!.uid)
+                                                  .whenComplete(() => {
+                                                        setState(() {
+                                                          FirebaseManager()
+                                                              .updateAvatar(
+                                                                  provider.url!,
+                                                                  user!.uid);
+                                                          print('Task 2');
+                                                        })
+                                                      })
+                                            });
                                   });
                                   // provider.url =
                                   //     FirebaseManager().downloadFromFireUrl(user!.uid);

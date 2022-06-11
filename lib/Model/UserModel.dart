@@ -1,4 +1,6 @@
 
+import 'package:firebase_storage/firebase_storage.dart';
+
 class UserModel {
   String? uid;
   String? name;
@@ -7,7 +9,7 @@ class UserModel {
   String? email;
   String? password;
   final List<String>? chatList ;
-
+  final String _avatar = 'https://firebasestorage.googleapis.com/v0/b/projectn01.appspot.com/o/images%2Fprofile.png?alt=media&token=5db803ec-de0d-48c7-877e-a784d0011a0c';
   UserModel(
       {this.uid,
       this.name,
@@ -42,9 +44,11 @@ class UserModel {
       'email': email,
       'password': password,
       "timestamp": DateTime.now(),
+      'avatar' : _avatar
       // 'gender': gender,
       // 'age': age,
     };
   }
+
 
 }

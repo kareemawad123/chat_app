@@ -51,7 +51,22 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                   Container(
-                    margin: const EdgeInsets.only(left: 30, top: 30),
+                    margin: const EdgeInsets.only(left: 0, top: 30, right: 20),
+                    width: 50,
+                    height: 50,
+                    child: StreamBuilder<QuerySnapshot>(
+                        stream: fireStore
+                            .collection('PersonInfo').where('uid', isEqualTo: args.chatId)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+
+                          return snapshot.hasData ? CircleAvatar(
+                            backgroundImage: NetworkImage(snapshot.data!.docs[0]['avatar']),
+                          ) : const CircularProgressIndicator.adaptive();
+                        }),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(left: 10, top: 30),
                     child: Text(
                       args.username!,
                       textAlign: TextAlign.center,

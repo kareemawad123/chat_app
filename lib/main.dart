@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
             ChatScreen.routeName: (context) => ChatScreen(),
           },
           home: AnimatedSplashScreen(
-              duration: 3000,
+              duration: 1000,
               splash: Icons.home,
               nextScreen: const LoginScreen(),
               splashTransition: SplashTransition.fadeTransition,
