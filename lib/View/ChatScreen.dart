@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:porject_n_01/Model/Constants.dart';
 import 'package:porject_n_01/Controller/DatabaseManager.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,6 @@ class _ChatScreenState extends State<ChatScreen> {
   User? user = FirebaseAuth.instance.currentUser;
   var fireStore = FirebaseFirestore.instance;
 
-
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -38,7 +38,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Container(
               height: height * 0.12,
               width: width,
-              color: Color(0xff113953),
+              color: const Color(0xff113953),
               child: Row(
                 children: <Widget>[
                   Container(
@@ -47,7 +47,10 @@ class _ChatScreenState extends State<ChatScreen> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      icon: const FaIcon(FontAwesomeIcons.arrowLeft,color: Colors.white,),
+                      icon: const FaIcon(
+                        FontAwesomeIcons.arrowLeft,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                   Container(
@@ -56,13 +59,16 @@ class _ChatScreenState extends State<ChatScreen> {
                     height: 50,
                     child: StreamBuilder<QuerySnapshot>(
                         stream: fireStore
-                            .collection('PersonInfo').where('uid', isEqualTo: args.chatId)
+                            .collection('PersonInfo')
+                            .where('uid', isEqualTo: args.chatId)
                             .snapshots(),
                         builder: (context, snapshot) {
-
-                          return snapshot.hasData ? CircleAvatar(
-                            backgroundImage: NetworkImage(snapshot.data!.docs[0]['avatar']),
-                          ) : const CircularProgressIndicator.adaptive();
+                          return snapshot.hasData
+                              ? CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      snapshot.data!.docs[0]['avatar']),
+                                )
+                              : const CircularProgressIndicator.adaptive();
                         }),
                   ),
                   Container(
@@ -101,90 +107,121 @@ class _ChatScreenState extends State<ChatScreen> {
                       .snapshots(),
                   builder: (context, snapShot) {
                     return snapShot.hasData
-                        ? ListView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            reverse: true,
-                            itemCount: snapShot.data?.docs.length,
-                            itemBuilder: (context, index) {
-                              //return Text('Length: ${snapShot.data?.docs.length}');
-                              return snapShot.data?.docs[index][currentId] ==
-                                      user!.uid
-                                  ?
+                        ? AnimationLimiter(
+                            child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              reverse: true,
+                              itemCount: snapShot.data?.docs.length,
+                              itemBuilder: (context, index) {
+                                //return Text('Length: ${snapShot.data?.docs.length}');
+                                return AnimationConfiguration.staggeredList(
+                                  position: index,
+                                  duration: const Duration(milliseconds: 375),
+                                  child: SlideAnimation(
+                                    verticalOffset: 50.0,
+                                    child: FadeInAnimation(
+                                      child: snapShot.data?.docs[index]
+                                                  [currentId] ==
+                                              user!.uid
+                                          ?
 
-                                  /// My Current Message
-                                  Column(
-                                    children: [
-                                      Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            Container(
-                                              margin: const EdgeInsets.only(
-                                                  top: 10,
-                                                  bottom: 15,
-                                                  right: 10,
-                                                  left: 10),
-                                              padding: const EdgeInsets.only(
-                                                  top: 15,
-                                                  left: 20,
-                                                  right: 15,
-                                                  bottom: 15),
-                                              decoration: const BoxDecoration(
-                                                color: Color(0xff113953),
-                                                borderRadius: BorderRadius.only(
-                                                  topRight: Radius.circular(40),
-                                                  bottomLeft: Radius.circular(40),
-                                                  topLeft: Radius.circular(40),
+                                          /// My Current Message
+                                          Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    Container(
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                              top: 10,
+                                                              bottom: 15,
+                                                              right: 10,
+                                                              left: 10),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 15,
+                                                              left: 20,
+                                                              right: 15,
+                                                              bottom: 15),
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        color:
+                                                            Color(0xff113953),
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  40),
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  40),
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  40),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        snapShot.data
+                                                                ?.docs[index]
+                                                            [messageData],
+                                                        style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 15,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ),
-                                              child: Text(
-                                                snapShot.data?.docs[index]
-                                                    [messageData],
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 15,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                    ],
-                                  )
-                                  :
+                                              ],
+                                            )
+                                          :
 
-                                  /// User Message
-                                  Row(
-                                      children: [
-                                        Container(
-                                          margin: const EdgeInsets.only(
-                                              top: 10,
-                                              bottom: 15,
-                                              right: 10,
-                                              left: 10),
-                                          padding: const EdgeInsets.only(
-                                              top: 15,
-                                              left: 20,
-                                              right: 15,
-                                              bottom: 15),
-                                          decoration: const BoxDecoration(
-                                            color: Colors.lightBlue,
-                                            borderRadius: BorderRadius.only(
-                                              topRight: Radius.circular(40),
-                                              bottomRight: Radius.circular(40),
-                                              topLeft: Radius.circular(40),
+                                          /// User Message
+                                          Row(
+                                              children: [
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                      top: 10,
+                                                      bottom: 15,
+                                                      right: 10,
+                                                      left: 10),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 15,
+                                                          left: 20,
+                                                          right: 15,
+                                                          bottom: 15),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    color: Colors.lightBlue,
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                      topRight:
+                                                          Radius.circular(40),
+                                                      bottomRight:
+                                                          Radius.circular(40),
+                                                      topLeft:
+                                                          Radius.circular(40),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    snapShot.data?.docs[index]
+                                                        [messageData],
+                                                    style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 15,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                          child: Text(
-                                            snapShot.data?.docs[index]
-                                                [messageData],
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                            },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           )
                         : snapShot.hasError
                             ? const Text('Error')
@@ -218,10 +255,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         filled: true,
                         fillColor: Colors.blue[50],
                         labelStyle: const TextStyle(
-                          color: Colors.blueAccent,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20
-                        ),
+                            color: Colors.blueAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20),
                         hintText: 'Type your message',
                         border: OutlineInputBorder(
                           borderSide: const BorderSide(width: 0),

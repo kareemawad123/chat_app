@@ -36,7 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   GlobalKey<FormState> RegFormKey = GlobalKey<FormState>();
 
   final ButtonStyle outlineButtonStyle = OutlinedButton.styleFrom(
-    backgroundColor: Colors.lightBlue.shade400,
+    backgroundColor: Color(0xff113953),
     primary: Colors.white,
     minimumSize: const Size(150, 40),
     shape: const RoundedRectangleBorder(
@@ -64,12 +64,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Container(
                 width: size.width,
                 height: size.height * 0.30,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                      colors: [Colors.blue.shade50, Colors.blue],
+                      colors: [Colors.white, Color(0xff113953),],
                       end: Alignment.topCenter,
                       begin: Alignment.bottomLeft),
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(100.0)),
                 ),
                 child: Column(

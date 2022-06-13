@@ -12,6 +12,7 @@ import '../Model/Constants.dart';
 import '../Controller/AuthenticationFunc.dart';
 import '../Controller/ProviderController.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = 'HomeScreen';
@@ -93,179 +94,202 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Container(
           decoration: const BoxDecoration(color: Color(0xff113953)),
           child: Stack(
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: height * 0.14,
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          margin: const EdgeInsets.only(left: 30, top: 30),
-                          width: 50,
-                          height: 50,
-                          child: StreamBuilder<QuerySnapshot>(
-                              stream: fireStore
-                                  .collection('PersonInfo').where('uid', isEqualTo: user!.uid)
-                                  .snapshots(),
-                              builder: (context, snapshot) {
-
-                                return snapshot.hasData ? CircleAvatar(
-                                  backgroundImage: NetworkImage(snapshot.data!.docs[0]['avatar']),
-                                ) : const CircularProgressIndicator.adaptive();
-                              }),
-                        ),
-                        Expanded(
-                            child: Container(
-                          margin: const EdgeInsets.only(left: 30, top: 30),
-                          child: const Text(
-                            'Chats',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 40,
-                              fontFamily: 'Nisebuschgardens',
+            children: AnimationConfiguration.toStaggeredList(
+              duration: const Duration(milliseconds: 375),
+              childAnimationBuilder: (widget) => SlideAnimation(
+                horizontalOffset: 50.0,
+                child: FadeInAnimation(
+                  child: widget,
+                ),
+              ),
+              children: <Widget>[
+                AnimationLimiter(
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: height * 0.14,
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              margin: const EdgeInsets.only(left: 30, top: 30),
+                              width: 50,
+                              height: 50,
+                              child: StreamBuilder<QuerySnapshot>(
+                                  stream: fireStore
+                                      .collection('PersonInfo')
+                                      .where('uid', isEqualTo: user!.uid)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    return snapshot.hasData
+                                        ? CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                          snapshot.data!.docs[0]['avatar']),
+                                    )
+                                        : const CircularProgressIndicator
+                                        .adaptive();
+                                  }),
                             ),
-                          ),
-                        )),
-                        Container(
-                          margin: const EdgeInsets.only(
-                              left: 30, top: 30, right: 20),
-                          child: IconButton(
-                            onPressed: () {
-                              logOutDialogueBox(context);
-                            },
-                            icon: const FaIcon(
-                              FontAwesomeIcons.rightFromBracket,
-                              color: Colors.white,
-                              size: 30,
+                            Expanded(
+                                child: Container(
+                                  margin: const EdgeInsets.only(left: 30, top: 30),
+                                  child: const Text(
+                                    'Chats',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 40,
+                                      fontFamily: 'Nisebuschgardens',
+                                    ),
+                                  ),
+                                )),
+                            Container(
+                              margin: const EdgeInsets.only(
+                                  left: 30, top: 30, right: 20),
+                              child: IconButton(
+                                onPressed: () {
+                                  logOutDialogueBox(context);
+                                },
+                                icon: const FaIcon(
+                                  FontAwesomeIcons.rightFromBracket,
+                                  color: Colors.white,
+                                  size: 30,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      width: width,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(40),
-                          topRight: Radius.circular(40),
+                          ],
                         ),
                       ),
-                      child: StreamBuilder<QuerySnapshot>(
-                        stream: fireStore
-                            .collection('PersonInfo')
-                            .orderBy('name', descending: true)
-                            .snapshots(),
-                        builder: (context, snapShot) {
-                          return snapShot.hasData
-                              ? ListView.builder(
+                      Expanded(
+                        child: Container(
+                          width: width,
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(40),
+                              topRight: Radius.circular(40),
+                            ),
+                          ),
+                          child: StreamBuilder<QuerySnapshot>(
+                            stream: fireStore
+                                .collection('PersonInfo')
+                                .orderBy('name', descending: true)
+                                .snapshots(),
+                            builder: (context, snapShot) {
+                              return snapShot.hasData
+                                  ? AnimationLimiter(
+                                child: ListView.builder(
                                   itemCount: snapShot.data?.docs.length,
                                   itemBuilder: (context, index) {
                                     //getData();
                                     if (snapShot.data?.docs[index].id !=
                                         user!.uid) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          getData();
-                                          print('DDDDD');
-                                          print(allData);
-                                          for (var element in allData) {
-                                            print(
-                                                'Elementsssss: ${element[chatId]}');
-                                            if (element[chatId]
-                                                    .toString()
-                                                    .split('+')
-                                                    .contains(user!.uid) &&
-                                                element[chatId]
-                                                    .toString()
-                                                    .split('+')
-                                                    .contains(snapShot.data
-                                                        ?.docs[index]['uid'])) {
-                                              collection = element[chatId];
-                                              print('True');
-                                              print('Collection: $collection');
-                                              break;
-                                            } else {
-                                              collection =
-                                                  '${user!.uid}+${snapShot.data?.docs[index]['uid']}';
-                                              print(
-                                                  'Else Collection: $collection');
-                                            }
-                                          }
-                                          Navigator.pushNamed(
-                                              context, ChatScreen.routeName,
-                                              arguments: ProfileData(
-                                                  username: snapShot.data
-                                                      ?.docs[index][userName],
-                                                  email: snapShot.data
-                                                      ?.docs[index][userEmail],
-                                                  chatId: snapShot.data
-                                                      ?.docs[index][userId],
-                                                  collection: collection));
-                                        },
-                                        child: Container(
-                                          padding: const EdgeInsets.only(
-                                              left: 16,
-                                              right: 16,
-                                              top: 10,
-                                              bottom: 10),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Expanded(
-                                                  child: Row(
-                                                children: <Widget>[
-                                                  CircleAvatar(
-                                                    backgroundImage:
-                                                        NetworkImage(snapShot
-                                                                .data
-                                                                ?.docs[index]
-                                                            ['avatar']),
-                                                    maxRadius: 30,
-                                                  ),
-                                                  const SizedBox(
-                                                    width: 16,
-                                                  ),
-                                                  Expanded(
-                                                      child: Container(
-                                                    color: Colors.transparent,
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: <Widget>[
-                                                        Text(
-                                                          snapShot.data
+                                      return AnimationConfiguration.staggeredList(
+                                        position: index,
+                                        duration: const Duration(milliseconds: 375),
+                                        child: SlideAnimation(
+                                          verticalOffset: 50.0,
+                                          child: FadeInAnimation(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                getData();
+                                                print('DDDDD');
+                                                print(allData);
+                                                for (var element in allData) {
+                                                  print(
+                                                      'Elementsssss: ${element[chatId]}');
+                                                  if (element[chatId]
+                                                      .toString()
+                                                      .split('+')
+                                                      .contains(user!.uid) &&
+                                                      element[chatId]
+                                                          .toString()
+                                                          .split('+')
+                                                          .contains(snapShot.data
+                                                          ?.docs[index]['uid'])) {
+                                                    collection = element[chatId];
+                                                    print('True');
+                                                    print('Collection: $collection');
+                                                    break;
+                                                  } else {
+                                                    collection =
+                                                    '${user!.uid}+${snapShot.data?.docs[index]['uid']}';
+                                                    print(
+                                                        'Else Collection: $collection');
+                                                  }
+                                                }
+                                                Navigator.pushNamed(
+                                                    context, ChatScreen.routeName,
+                                                    arguments: ProfileData(
+                                                        username: snapShot.data
+                                                            ?.docs[index][userName],
+                                                        email: snapShot.data
+                                                            ?.docs[index][userEmail],
+                                                        chatId: snapShot.data
+                                                            ?.docs[index][userId],
+                                                        collection: collection));
+                                              },
+                                              child: Container(
+                                                padding: const EdgeInsets.only(
+                                                    left: 16,
+                                                    right: 16,
+                                                    top: 10,
+                                                    bottom: 10),
+                                                child: Row(
+                                                  children: <Widget>[
+                                                    Expanded(
+                                                        child: Row(
+                                                          children: <Widget>[
+                                                            CircleAvatar(
+                                                              backgroundImage:
+                                                              NetworkImage(snapShot
+                                                                  .data
                                                                   ?.docs[index]
-                                                              [userName],
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize: 16),
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 6,
-                                                        ),
-                                                        Text(
-                                                          snapShot.data
-                                                                  ?.docs[index]
-                                                              [userEmail],
-                                                          style: TextStyle(
-                                                              fontSize: 13,
-                                                              color: Colors.grey
-                                                                  .shade600,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ))
-                                                ],
-                                              ))
-                                            ],
+                                                              ['avatar']),
+                                                              maxRadius: 30,
+                                                            ),
+                                                            const SizedBox(
+                                                              width: 16,
+                                                            ),
+                                                            Expanded(
+                                                                child: Container(
+                                                                  color: Colors.transparent,
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                    children: <Widget>[
+                                                                      Text(
+                                                                        snapShot.data
+                                                                            ?.docs[index]
+                                                                        [userName],
+                                                                        style:
+                                                                        const TextStyle(
+                                                                            fontSize: 16),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                        height: 6,
+                                                                      ),
+                                                                      Text(
+                                                                        snapShot.data
+                                                                            ?.docs[index]
+                                                                        [userEmail],
+                                                                        style: TextStyle(
+                                                                            fontSize: 13,
+                                                                            color: Colors.grey
+                                                                                .shade600,
+                                                                            fontWeight:
+                                                                            FontWeight
+                                                                                .bold),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ))
+                                                          ],
+                                                        ))
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       );
@@ -273,23 +297,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                       return Container();
                                     }
                                   },
-                                )
-                              : snapShot.hasError
+                                ),
+                              )
+                                  : snapShot.hasError
                                   ? const Text('Error')
                                   : Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        CircularProgressIndicator.adaptive()
-                                      ],
-                                    );
-                        },
+                                mainAxisAlignment:
+                                MainAxisAlignment.center,
+                                children: const [
+                                  CircularProgressIndicator.adaptive()
+                                ],
+                              );
+                            },
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -299,237 +326,271 @@ class _HomeScreenState extends State<HomeScreen> {
         decoration: const BoxDecoration(
           color: Color(0xff113953),
         ),
-        child: ListView(
-          children: [
-            const SizedBox(
-              height: 30,
-            ),
-            const Text(
-              'My Profile',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 40,
-                fontFamily: 'Nisebuschgardens',
+        child: AnimationLimiter(
+          child: ListView(
+            children: AnimationConfiguration.toStaggeredList(
+              duration: const Duration(milliseconds: 375),
+              childAnimationBuilder: (widget) => SlideAnimation(
+                //scale: 2,
+                horizontalOffset: 50.0,
+                child: FadeInAnimation(
+                  child: widget,
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              height: height * 0.55,
-              //color: Colors.black,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  double innerHeight = constraints.maxHeight;
-                  double innerWidth = constraints.maxWidth;
-                  return Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Positioned(
-                        bottom: 35,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: Container(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            height: innerHeight * 0.75,
-                            width: innerWidth,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              color: Colors.white,
-                            ),
-                            child: StreamBuilder<QuerySnapshot>(
-                                stream: fireStore
-                                    .collection('PersonInfo')
-                                    .where(userId, isEqualTo: user?.uid)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-                                  return snapshot.hasData
-                                      ? Column(
-                                          children: [
-                                            const SizedBox(
-                                              height: 100,
-                                            ),
-                                            Container(
-                                              margin: const EdgeInsets.only(
-                                                  left: 10, right: 10),
-                                              alignment: Alignment.topLeft,
-                                              child: Row(
-                                                children: [
-                                                  const Text("Name: ",
-                                                      style: TextStyle(
-                                                          fontFamily: 'Nunito',
-                                                          fontSize: 20,
-                                                          color: Colors.blue)),
-                                                  Text(
-                                                      "${snapshot.data?.docs[0][userName]}",
-                                                      style: const TextStyle(
-                                                        fontFamily: 'Nunito',
-                                                        fontSize: 20,
-                                                      )),
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: const EdgeInsets.only(
-                                                  left: 10, right: 10),
-                                              alignment: Alignment.topLeft,
-                                              child: Row(
-                                                children: [
-                                                  const Text("Email: ",
-                                                      style: TextStyle(
-                                                          fontFamily: 'Nunito',
-                                                          fontSize: 20,
-                                                          color: Colors.blue)),
-                                                  Text(
-                                                      snapshot.data!.docs[0]
-                                                          [userEmail],
-                                                      style: const TextStyle(
-                                                          fontFamily: 'Nunito',
-                                                          fontSize: 20)),
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: const EdgeInsets.only(
-                                                  left: 10, right: 10),
-                                              alignment: Alignment.topLeft,
-                                              child: Row(
-                                                children: const [
-                                                  Text("Age: ",
-                                                      style: TextStyle(
-                                                          fontFamily: 'Nunito',
-                                                          fontSize: 20,
-                                                          color: Colors.blue)),
-                                                  Text("22",
-                                                      style: TextStyle(
-                                                          fontFamily: 'Nunito',
-                                                          fontSize: 20)),
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: const EdgeInsets.only(
-                                                  left: 10, right: 10),
-                                              alignment: Alignment.topLeft,
-                                              child: Row(
-                                                children: const [
-                                                  Text("Gender: ",
-                                                      style: TextStyle(
-                                                          fontFamily: 'Nunito',
-                                                          fontSize: 20,
-                                                          color: Colors.blue)),
-                                                  Text("Male",
-                                                      style: TextStyle(
-                                                          fontFamily: 'Nunito',
-                                                          fontSize: 20)),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                      : snapshot.hasError
-                                          ? const Text('ERROR')
-                                          : Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: const [
-                                                CircularProgressIndicator(),
-                                              ],
-                                            );
-                                }),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 20,
-                        left: innerWidth * 0.3,
-                        right: innerWidth * 0.3,
-                        child: SizedBox(
-                          width: innerWidth * 0.4,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              openDialogueBox(context);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: const Color(0xff113953),
-                            ),
-                            child: const Text('Edit',
-                                style: TextStyle(fontFamily: 'Nunito')),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: SizedBox(
-                            width: 130,
-                            height: 130,
-                            child: StreamBuilder<QuerySnapshot>(
-                                stream: fireStore
-                                    .collection('PersonInfo').where('uid', isEqualTo: user!.uid)
-                                    .snapshots(),
-                                builder: (context, snapshot) {
-
-                                  return snapshot.hasData ? CircleAvatar(
-                                    backgroundImage: NetworkImage(snapshot.data!.docs[0]['avatar']),
-                                  ) : const CircularProgressIndicator.adaptive();
-                                }),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                          top: 80,
-                          right: 90,
-                          child: Consumer<ProviderController>(
-                            builder: (context, provider, child) {
-                              return RawMaterialButton(
-                                onPressed: () {
-                                  provider.uploadImage().whenComplete(() {
-                                    print('Task 1');
-                                    FirebaseManager()
-                                        .uploadImageToFire(
-                                            provider.image, user!.uid)
-                                        .whenComplete(() => {
-                                              provider
-                                                  .downloadFromFireUrl(
-                                                      user!.uid)
-                                                  .whenComplete(() => {
-                                                        setState(() {
-                                                          FirebaseManager()
-                                                              .updateAvatar(
-                                                                  provider.url!,
-                                                                  user!.uid);
-                                                          print('Task 2');
-                                                        })
-                                                      })
-                                            });
-                                  });
-                                  // provider.url =
-                                  //     FirebaseManager().downloadFromFireUrl(user!.uid);
-                                  //provider.downloadFromFireUrl(user!.uid);
-                                },
-                                fillColor: const Color(0xff113953),
-                                child: const Icon(
-                                  Icons.add_a_photo_outlined,
+              children: <Widget>[
+                const SizedBox(
+                  height: 30,
+                ),
+                const Text(
+                  'My Profile',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 40,
+                    fontFamily: 'Nisebuschgardens',
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  height: height * 0.55,
+                  //color: Colors.black,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      double innerHeight = constraints.maxHeight;
+                      double innerWidth = constraints.maxWidth;
+                      return Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Positioned(
+                            bottom: 35,
+                            left: 0,
+                            right: 0,
+                            child: Center(
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                height: innerHeight * 0.75,
+                                width: innerWidth,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
                                   color: Colors.white,
                                 ),
-                                padding: const EdgeInsets.all(15.0),
-                                shape: const CircleBorder(),
-                              );
-                            },
-                          )),
-                    ],
-                  );
-                },
-              ),
-            )
-          ],
+                                child: StreamBuilder<QuerySnapshot>(
+                                    stream: fireStore
+                                        .collection('PersonInfo')
+                                        .where(userId, isEqualTo: user?.uid)
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      return snapshot.hasData
+                                          ? Column(
+                                              children: [
+                                                const SizedBox(
+                                                  height: 100,
+                                                ),
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                      left: 10, right: 10),
+                                                  alignment: Alignment.topLeft,
+                                                  child: Row(
+                                                    children: [
+                                                      const Text("Name: ",
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'Nunito',
+                                                              fontSize: 20,
+                                                              color:
+                                                                  Colors.blue)),
+                                                      Text(
+                                                          "${snapshot.data?.docs[0][userName]}",
+                                                          style:
+                                                              const TextStyle(
+                                                            fontFamily:
+                                                                'Nunito',
+                                                            fontSize: 20,
+                                                          )),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                      left: 10, right: 10),
+                                                  alignment: Alignment.topLeft,
+                                                  child: Row(
+                                                    children: [
+                                                      const Text("Email: ",
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'Nunito',
+                                                              fontSize: 20,
+                                                              color:
+                                                                  Colors.blue)),
+                                                      Text(
+                                                          snapshot.data!.docs[0]
+                                                              [userEmail],
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontFamily:
+                                                                      'Nunito',
+                                                                  fontSize:
+                                                                      20)),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                      left: 10, right: 10),
+                                                  alignment: Alignment.topLeft,
+                                                  child: Row(
+                                                    children: const [
+                                                      Text("Age: ",
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'Nunito',
+                                                              fontSize: 20,
+                                                              color:
+                                                                  Colors.blue)),
+                                                      Text("22",
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'Nunito',
+                                                              fontSize: 20)),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Container(
+                                                  margin: const EdgeInsets.only(
+                                                      left: 10, right: 10),
+                                                  alignment: Alignment.topLeft,
+                                                  child: Row(
+                                                    children: const [
+                                                      Text("Gender: ",
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'Nunito',
+                                                              fontSize: 20,
+                                                              color:
+                                                                  Colors.blue)),
+                                                      Text("Male",
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'Nunito',
+                                                              fontSize: 20)),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : snapshot.hasError
+                                              ? const Text('ERROR')
+                                              : Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: const [
+                                                    CircularProgressIndicator(),
+                                                  ],
+                                                );
+                                    }),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 20,
+                            left: innerWidth * 0.3,
+                            right: innerWidth * 0.3,
+                            child: SizedBox(
+                              width: innerWidth * 0.4,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  openDialogueBox(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: const Color(0xff113953),
+                                ),
+                                child: const Text('Edit',
+                                    style: TextStyle(fontFamily: 'Nunito')),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: Center(
+                              child: SizedBox(
+                                width: 130,
+                                height: 130,
+                                child: StreamBuilder<QuerySnapshot>(
+                                    stream: fireStore
+                                        .collection('PersonInfo')
+                                        .where('uid', isEqualTo: user!.uid)
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      return snapshot.hasData
+                                          ? CircleAvatar(
+                                              backgroundImage: NetworkImage(
+                                                  snapshot.data!.docs[0]
+                                                      ['avatar']),
+                                            )
+                                          : const CircularProgressIndicator
+                                              .adaptive();
+                                    }),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                              top: 80,
+                              right: 90,
+                              child: Consumer<ProviderController>(
+                                builder: (context, provider, child) {
+                                  return RawMaterialButton(
+                                    onPressed: () {
+                                      provider.uploadImage().whenComplete(() {
+                                        print('Task 1');
+                                        FirebaseManager()
+                                            .uploadImageToFire(
+                                                provider.image, user!.uid)
+                                            .whenComplete(() => {
+                                                  provider
+                                                      .downloadFromFireUrl(
+                                                          user!.uid)
+                                                      .whenComplete(() => {
+                                                            setState(() {
+                                                              FirebaseManager()
+                                                                  .updateAvatar(
+                                                                      provider
+                                                                          .url!,
+                                                                      user!
+                                                                          .uid);
+                                                              print('Task 2');
+                                                            })
+                                                          })
+                                                });
+                                      });
+                                      // provider.url =
+                                      //     FirebaseManager().downloadFromFireUrl(user!.uid);
+                                      //provider.downloadFromFireUrl(user!.uid);
+                                    },
+                                    fillColor: const Color(0xff113953),
+                                    child: const Icon(
+                                      Icons.add_a_photo_outlined,
+                                      color: Colors.white,
+                                    ),
+                                    padding: const EdgeInsets.all(15.0),
+                                    shape: const CircleBorder(),
+                                  );
+                                },
+                              )),
+                        ],
+                      );
+                    },
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     ];

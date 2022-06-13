@@ -18,26 +18,6 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 
-// static Future<User?> signInFunc({required String email, required String password, required BuildContext context})async{
-//   FirebaseAuth auth = FirebaseAuth.instance;
-//   User? user;
-//   try{
-//     UserCredential userCredential = await auth.signInWithEmailAndPassword(email: email.trim(), password: password);
-//     user = userCredential.user;
-//     Fluttertoast.showToast(msg: "Login Successful");
-//   }on FirebaseAuthException catch(e){
-//     if(e.message == 'Given String is empty or null'){
-//       Fluttertoast.showToast(msg: "Please enter a valid email");
-//     }else if(e.message == "The email address is badly formatted."){
-//       Fluttertoast.showToast(msg: "Please enter a valid email");
-//
-//     }else{
-//       print(e.message);
-//     }
-//   }
-//   return user;
-// }
-
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -47,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool ActiveConnection = false;
 
   final ButtonStyle outlineButtonStyle = OutlinedButton.styleFrom(
-    backgroundColor: Colors.lightBlue.shade400,
+    backgroundColor: const Color(0xff113953),
     primary: Colors.white,
     minimumSize: const Size(150, 40),
     shape: const RoundedRectangleBorder(
@@ -78,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: SingleChildScrollView(
         reverse: false,
-        child: Container(
+        child: SizedBox(
           height: size.height,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -88,12 +68,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                   width: size.width,
                   height: size.height * 0.30,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                        colors: [Colors.blue.shade50, Colors.blue],
+                        colors: [Colors.white, Color(0xff113953),],
                         end: Alignment.topCenter,
                         begin: Alignment.bottomLeft),
-                    borderRadius: const BorderRadius.only(
+                    borderRadius: BorderRadius.only(
                         bottomLeft: Radius.circular(100.0)),
                   ),
                   child: Column(

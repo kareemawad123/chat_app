@@ -53,11 +53,11 @@ class MyApp extends StatelessWidget {
           },
           home: AnimatedSplashScreen(
               duration: 1000,
-              splash: Icons.home,
+              splash: const Icon(Icons.wechat, color: Colors.white,size: 100,),
               nextScreen: const LoginScreen(),
               splashTransition: SplashTransition.fadeTransition,
               //pageTransitionType: PageTransitionType.scale,
-              backgroundColor: Colors.blue.shade300)),
+              backgroundColor: const Color(0xff113953))),
     );
   }
 }

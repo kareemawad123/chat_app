@@ -22,6 +22,9 @@ dependencies:
   font_awesome_flutter: ^10.1.0
   animations: ^2.0.2
   firebase_storage: ^10.2.17
+  flutter_staggered_animations: ^1.0.0
+  #animated_text_kit: ^4.2.2
+  animate_do: ^2.1.0
 
 
 
