@@ -2,5 +2,5 @@
 
 My first flutter project.
 
-## Please support me, and accept constructive criticism
+## Please support me, and i'm accept constructive criticism
 
