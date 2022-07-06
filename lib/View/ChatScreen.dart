@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -65,8 +66,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         builder: (context, snapshot) {
                           return snapshot.hasData
                               ? CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      snapshot.data!.docs[0]['avatar']),
+                                  backgroundImage: CachedNetworkImageProvider(snapshot.data!.docs[0]['avatar']),
                                 )
                               : const CircularProgressIndicator.adaptive();
                         }),
@@ -319,5 +319,21 @@ class _ChatScreenState extends State<ChatScreen> {
     });
     print('Done');
     messageController.clear();
+  }
+
+  void addMedicament(String? id, String? nom, int? stock) async {
+    var fireStore = FirebaseFirestore.instance;
+
+    print('ID: $id');
+    await fireStore
+        .collection('users')
+        .doc(id)
+        .collection('listmed')
+        .add({
+      'nom': nom,
+      'stock': stock,
+    });
+    print('Done');
+
   }
 }

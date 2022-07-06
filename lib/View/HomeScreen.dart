@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,7 +14,8 @@ import '../Controller/AuthenticationFunc.dart';
 import '../Controller/ProviderController.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-
+/// Ford Payment
+/// Cached Network Image
 class HomeScreen extends StatefulWidget {
   static const String routeName = 'HomeScreen';
 
@@ -32,11 +34,11 @@ class ProfileData {
   ProfileData({this.username, this.collection, this.email, this.chatId});
 }
 
+
 class _HomeScreenState extends State<HomeScreen> {
   final AuthenticationServices _auth = AuthenticationServices();
   var fireStore = FirebaseFirestore.instance;
   User? user = FirebaseAuth.instance.currentUser;
-  UserModel userModelLogged = UserModel();
   TextEditingController nameController = TextEditingController();
   List allData = [];
   String collection = '';
@@ -49,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
     QuerySnapshot querySnapshot = await _collectionRef.get();
     allData = querySnapshot.docs.map((doc) => doc.data()).toList();
     print(allData);
-  }
+      }
 
   delayFunc() {
     Timer(const Duration(milliseconds: 500), () {
@@ -122,9 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   builder: (context, snapshot) {
                                     return snapshot.hasData
                                         ? CircleAvatar(
-                                      backgroundImage: NetworkImage(
-                                          snapshot.data!.docs[0]['avatar']),
-                                    )
+                                      backgroundImage: CachedNetworkImageProvider(snapshot.data!.docs[0]['avatar']))
                                         : const CircularProgressIndicator
                                         .adaptive();
                                   }),
@@ -241,10 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           children: <Widget>[
                                                             CircleAvatar(
                                                               backgroundImage:
-                                                              NetworkImage(snapShot
-                                                                  .data
-                                                                  ?.docs[index]
-                                                              ['avatar']),
+                                                              CachedNetworkImageProvider(snapShot.data!.docs[index]['avatar']),
                                                               maxRadius: 30,
                                                             ),
                                                             const SizedBox(

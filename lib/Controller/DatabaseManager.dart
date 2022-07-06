@@ -8,7 +8,7 @@ import '../View/LoginScreen.dart';
 import '../Model/UserModel.dart';
 import 'dart:io';
 
-class FirebaseManager{
+class FirebaseManager {
   final CollectionReference profileList =
       FirebaseFirestore.instance.collection('PersonInfo');
   final _auth = FirebaseAuth.instance;
@@ -45,15 +45,12 @@ class FirebaseManager{
     await _auth
         .createUserWithEmailAndPassword(email: email.trim(), password: password)
         .then((value) => {
-              postDetailsToFirestore(context,
-                  name: name, password: password),
+              postDetailsToFirestore(context, name: name, password: password),
             });
   }
 
   postDetailsToFirestore(BuildContext context,
-      {required String name,
-
-      required String password}) async {
+      {required String name, required String password}) async {
     FirebaseFirestore fireStore = FirebaseFirestore.instance;
     User? user = _auth.currentUser;
     UserModel userModel = UserModel();
@@ -72,32 +69,28 @@ class FirebaseManager{
       LoginScreen.routeName,
     );
   }
-  Future setImage (String imageEncode, String uid) async {
+
+  Future setImage(String imageEncode, String uid) async {
     print('Image: $imageEncode');
-    return await profileList.doc(uid).update({
-      'image': imageEncode
-    });
+    return await profileList.doc(uid).update({'image': imageEncode});
   }
+
   Future updateUser(String name, String uid) async {
-    return await profileList.doc(uid).set({
-      'name': name
-    });
+    return await profileList.doc(uid).set({'name': name});
   }
+
   Future updateAvatar(String url, String uid) async {
-    return await profileList.doc(uid).update({
-      'avatar': url
-    });
+    return await profileList.doc(uid).update({'avatar': url});
   }
+
   updateData(String name, String userID) async {
     await FirebaseManager().updateUser(name, userID);
   }
 
-  Future uploadImageToFire (File? image, String? userId) async{
+  Future uploadImageToFire(File? image, String? userId) async {
     const destination = 'images/';
     try {
-      final ref = FirebaseStorage.instance
-          .ref(destination)
-          .child(userId!);
+      final ref = FirebaseStorage.instance.ref(destination).child(userId!);
       await ref.putFile(image!);
       print('Upload Done');
     } catch (e) {
@@ -105,22 +98,22 @@ class FirebaseManager{
     }
   }
 
-  //  downloadFromFireUrl(String? userId) {
-  //   String? url;
-  //   final storage = FirebaseStorage.instance;
-  //   const destination = 'images/';
-  //     try {
-  //        storage
-  //           .ref(destination)
-  //           .child(userId!)
-  //           .getDownloadURL()
-  //           .then((value) => {url = value});
-  //       print('Download Done 000');
-  //     } catch (e) {
-  //       print('-----------Error in download image ---------');
-  //     }
-  //   print('Image URL: $url');
-  //   return url ?? 'Null Value000';
-  // }
+//  downloadFromFireUrl(String? userId) {
+//   String? url;
+//   final storage = FirebaseStorage.instance;
+//   const destination = 'images/';
+//     try {
+//        storage
+//           .ref(destination)
+//           .child(userId!)
+//           .getDownloadURL()
+//           .then((value) => {url = value});
+//       print('Download Done 000');
+//     } catch (e) {
+//       print('-----------Error in download image ---------');
+//     }
+//   print('Image URL: $url');
+//   return url ?? 'Null Value000';
+// }
 
 }

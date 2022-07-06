@@ -25,6 +25,8 @@ dependencies:
   flutter_staggered_animations: ^1.0.0
   #animated_text_kit: ^4.2.2
   animate_do: ^2.1.0
+  get:
+  cached_network_image: ^3.0.0
 
 
 

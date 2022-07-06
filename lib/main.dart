@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
           routes: {
             LoginScreen.routeName: (context) => const LoginScreen(),
             RegisterScreen.routeName: (context) => RegisterScreen(),
-            HomeScreen.routeName: (context) => HomeScreen(),
+            HomeScreen.routeName: (context) => const HomeScreen(),
             ChatScreen.routeName: (context) => ChatScreen(),
           },
           home: AnimatedSplashScreen(
